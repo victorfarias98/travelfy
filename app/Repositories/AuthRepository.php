@@ -3,33 +3,32 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Repositories\Contracts\AuthRepositoryInterface;
-use Illuminate\Support\Facades\Auth;
+use App\Interfaces\AuthRepositoryInterface;
+use Exception;
+use Illuminate\Database\QueryException;
+use Throwable;
 
 class AuthRepository implements AuthRepositoryInterface
 {
-    public function attempt(array $credentials): bool
+    public function findByEmail(string $email): ?User
     {
-        return auth('api')->attempt($credentials);
+        try {
+            return User::query()->where('email', $email)->first();
+        } catch (QueryException $e) {
+            throw new Exception('Erro ao recuperar usuário: ' . $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception('Erro inesperado: ' . $e->getMessage());
+        }
     }
 
-    public function user(): User
+    public function createUser(array $data): User
     {
-        return Auth::guard('api')->user();
+        try {
+            return User::query()->create($data);
+        } catch (QueryException $e) {
+            throw new Exception('Erro ao criar usuário: ' . $e->getMessage());
+        } catch (Throwable $e) {
+            throw new Exception('Erro inesperado: ' . $e->getMessage());
+        }
     }
-
-    public function logout(): void
-    {
-       auth('api')->logout();
-    }
-
-    public function refresh(): mixed
-    {        
-        return auth('api')->refresh();
-    }
-
-    public function getTTL(): mixed
-    {
-        return auth('api')->factory()->getTTL();
-    }
-} 
+}

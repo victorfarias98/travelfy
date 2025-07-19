@@ -1,61 +1,389 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# README
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Visão Geral
 
-## About Laravel
+Esta API permite gerenciar pedidos de viagem, incluindo criação, listagem, visualização, atualização de status e cancelamento. A API utiliza autenticação baseada em usuários e diferentes níveis de permissão.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Autenticação
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Todos os endpoints requerem autenticação. O usuário autenticado é obtido através de `Auth::user()`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Níveis de Permissão
+- **Admin**: Acesso completo a todos os pedidos
+- **Usuário comum**: Acesso apenas aos próprios pedidos
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Endpoints
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. Listar Pedidos de Viagem
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**GET** `/travel-requests`
 
-## Laravel Sponsors
+Lista todos os pedidos de viagem com filtros opcionais. Apenas para Administradores!
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### Parâmetros de Query (Filtros)
 
-### Premium Partners
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `status` | string | Filtrar por status do pedido |
+| `destination` | string | Filtrar por destino |
+| `departure_date_from` | date | Data de partida inicial |
+| `departure_date_to` | date | Data de partida final |
+| `return_date_from` | date | Data de retorno inicial |
+| `return_date_to` | date | Data de retorno final |
+| `user_id` | integer | ID do usuário |
+| `created_from` | date | Data de criação inicial |
+| `created_to` | date | Data de criação final |
+| `order_by` | string | Campo para ordenação |
+| `order_direction` | string | Direção da ordenação (asc/desc) |
+| `per_page` | integer | Itens por página (padrão: 15) |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+#### Resposta de Sucesso (200)
 
-## Contributing
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "",
+      "user_id": "",
+      "destination": "São Paulo",
+      "departure_date": "2024-12-15",
+      "return_date": "2024-12-20",
+      "status": "pending",
+      "created_at": "2024-12-01T10:00:00Z",
+      "updated_at": "2024-12-01T10:00:00Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 5,
+    "per_page": 15,
+    "total": 75
+  }
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Resposta de Erro (500)
 
-## Code of Conduct
+```json
+{
+  "success": false,
+  "message": "Erro ao buscar pedidos de viagem",
+  "error": "Mensagem de erro detalhada"
+}
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+### 2. Criar Pedido de Viagem
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**POST** `/travel-requests`
 
-## License
+Cria um novo pedido de viagem.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+#### Corpo da Requisição
+
+O corpo deve seguir as regras definidas em `StoreTravelRequestRequest`. Exemplo:
+
+```json
+{
+  "destination": "Rio de Janeiro",
+  "departure_date": "2024-12-20",
+  "return_date": "2024-12-25",
+}
+```
+
+#### Resposta de Sucesso (201)
+
+```json
+{
+  "success": true,
+  "message": "Pedido de viagem criado com sucesso",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "destination": "Rio de Janeiro",
+    "departure_date": "2024-12-20",
+    "return_date": "2024-12-25",
+    "status": "pending",
+    "user": {
+      "id": 1,
+      "name": "João Silva",
+      "email": "joao@example.com"
+    },
+    "created_at": "2024-12-01T10:00:00Z",
+    "updated_at": "2024-12-01T10:00:00Z"
+  }
+}
+```
+
+#### Resposta de Erro - Dados Inválidos (422)
+
+```json
+{
+  "success": false,
+  "message": "Dados inválidos",
+  "error": "Mensagem de erro de validação"
+}
+```
+
+#### Resposta de Erro - Servidor (500)
+
+```json
+{
+  "success": false,
+  "message": "Erro ao criar pedido de viagem",
+  "error": "Mensagem de erro detalhada"
+}
+```
+
+---
+
+### 3. Visualizar Pedido Específico
+
+**GET** `/travel-requests/{id}`
+
+Retorna os detalhes de um pedido de viagem específico.
+
+#### Parâmetros de URL
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `id` | string | ID do pedido de viagem |
+
+#### Regras de Acesso
+- **Admin**: Pode visualizar qualquer pedido
+- **Usuário comum**: Pode visualizar apenas seus próprios pedidos
+
+#### Resposta de Sucesso (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "destination": "São Paulo",
+    "departure_date": "2024-12-15",
+    "return_date": "2024-12-20",
+    "status": "approved",
+    "created_at": "2024-12-01T10:00:00Z",
+    "updated_at": "2024-12-05T14:30:00Z"
+  }
+}
+```
+
+#### Resposta de Erro - Não Encontrado (404)
+
+```json
+{
+  "success": false,
+  "message": "Pedido de viagem não encontrado"
+}
+```
+
+#### Resposta de Erro - Acesso Negado (403)
+
+```json
+{
+  "success": false,
+  "message": "Acesso negado"
+}
+```
+
+---
+
+### 4. Atualizar Status do Pedido
+
+**PUT** `/travel-requests/{id}/status`
+
+Atualiza o status de um pedido de viagem.
+
+#### Parâmetros de URL
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `id` | string | ID do pedido de viagem |
+
+#### Corpo da Requisição
+
+```json
+{
+  "status": "approved"
+}
+```
+
+Os valores válidos para `status` devem seguir as regras definidas em `UpdateTravelRequestRequest`.
+
+#### Resposta de Sucesso (200)
+
+```json
+{
+  "success": true,
+  "message": "Status do pedido atualizado com sucesso",
+  "data": {
+    "id": 1,
+    "status": "approved",
+    "updated_at": "2024-12-05T14:30:00Z",
+    "user": {
+      "id": 1,
+      "name": "João Silva",
+      "email": "joao@example.com"
+    }
+  }
+}
+```
+
+#### Resposta de Erro (400)
+
+```json
+{
+  "success": false,
+  "message": "Erro ao atualizar status do pedido",
+  "error": "Mensagem de erro detalhada"
+}
+```
+
+---
+
+### 5. Cancelar Pedido Aprovado
+
+**PUT** `/travel-requests/{id}/cancel-approved`
+
+Cancela um pedido de viagem que foi previamente aprovado.
+
+#### Parâmetros de URL
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `id` | string | ID do pedido de viagem |
+
+#### Resposta de Sucesso (200)
+
+```json
+{
+  "success": true,
+  "message": "Pedido aprovado cancelado com sucesso",
+  "data": {
+    "id": 1,
+    "status": "cancelled",
+    "updated_at": "2024-12-05T16:45:00Z",
+    "user": {
+      "id": 1,
+      "name": "João Silva",
+      "email": "joao@example.com"
+    }
+  }
+}
+```
+
+#### Resposta de Erro (400)
+
+```json
+{
+  "success": false,
+  "message": "Erro ao cancelar pedido aprovado",
+  "error": "Mensagem de erro detalhada"
+}
+```
+
+---
+
+### 6. Meus Pedidos
+
+**GET** `/my-travel-requests`
+
+Lista os pedidos de viagem do usuário autenticado.
+
+#### Parâmetros de Query
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `status` | string | Filtrar por status |
+| `per_page` | integer | Itens por página (padrão: 15) |
+
+#### Resposta de Sucesso (200)
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "destination": "São Paulo",
+      "departure_date": "2024-12-15",
+      "return_date": "2024-12-20",
+      "status": "pending",
+      "created_at": "2024-12-01T10:00:00Z",
+      "updated_at": "2024-12-01T10:00:00Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 2,
+    "per_page": 15,
+    "total": 23
+  }
+}
+```
+
+---
+
+## Códigos de Status HTTP
+
+| Código | Descrição |
+|--------|-----------|
+| 200 | Sucesso |
+| 201 | Criado com sucesso |
+| 400 | Requisição inválida |
+| 403 | Acesso negado |
+| 404 | Não encontrado |
+| 422 | Dados de entrada inválidos |
+| 500 | Erro interno do servidor |
+
+---
+
+## Estrutura Padrão de Resposta
+
+### Sucesso
+```json
+{
+  "success": true,
+  "message": "Mensagem de sucesso (opcional)",
+  "data": {}, // Dados da resposta
+  "meta": {} // Metadados para paginação (quando aplicável)
+}
+```
+
+### Erro
+```json
+{
+  "success": false,
+  "message": "Mensagem de erro",
+  "error": "Detalhes técnicos do erro (opcional)"
+}
+```
+
+---
+
+## Observações Técnicas
+
+1. **Injeção de Dependência**: O controller utiliza injeção de dependência do `TravelRequestService`
+2. **DTOs**: Utiliza `TravelRequestDTO` para transferência de dados
+3. **Form Requests**: Utiliza `StoreTravelRequestRequest` e `UpdateTravelRequestRequest` para validação
+4. **Relacionamentos**: Carrega automaticamente o relacionamento `user` em algumas operações
+5. **Paginação**: Utiliza paginação padrão do Laravel com metadados de navegação
+6. **Tratamento de Exceções**: Implementa tratamento robusto de exceções com diferentes tipos de erro
+
+---
+
+## Dependências
+
+- **TravelRequestService**: Serviço que contém a lógica de negócio
+- **TravelRequestDTO**: Objeto de transferência de dados
+- **StoreTravelRequestRequest**: Validação para criação de pedidos
+- **UpdateTravelRequestRequest**: Validação para atualização de status
+- **Laravel Auth**: Sistema de autenticação do Laravel

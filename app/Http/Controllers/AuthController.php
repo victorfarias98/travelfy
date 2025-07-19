@@ -2,83 +2,79 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Services\Contracts\AuthServiceInterface;
+use App\DTOs\AuthDTO;
+use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\RegisterUserRequest;
+use App\Interfaces\AuthServiceInterface;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected AuthServiceInterface $authService
+    ) {}
 
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct(protected AuthServiceInterface $authService)
+    public function login(LoginUserRequest $request): JsonResponse
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
-    }
+        try {
+            $token = $this->authService->login(AuthDTO::fromRequest($request->validated()));
 
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function login()
-    {
-        $credentials = request(['email', 'password']);
-
-        if (! $token = $this->authService->login($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['token' => $token], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
         }
-
-        return $this->respondWithToken($token);
     }
 
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function me()
+    public function register(RegisterUserRequest $request): JsonResponse
     {
-        return response()->json($this->authService->me());
+        try {
+            $user = $this->authService->register($request->validated());
+            return response()->json([
+                'message' => 'Usuário registrado com sucesso!',
+                'user' => $user
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout()
+    public function logout(): JsonResponse
     {
-        $this->authService->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        try {
+            $this->authService->logout();
+            return response()->json(['message' => 'Logout realizado com sucesso.'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
+    public function refresh(): JsonResponse
     {
-        return $this->respondWithToken($this->authService->refresh());
+        try {
+            return response()->json(['token' => $this->authService->refresh()], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithToken($token)
+    public function me(): JsonResponse
     {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $this->authService->getTTL() * 60
-        ]);
+        try {
+            return response()->json(['user' => $this->authService->me()], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
+
 }
