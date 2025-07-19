@@ -24,7 +24,7 @@ class TravelRequestService
         $this->validateTravelDates($dto->departureDate, $dto->returnDate);
 
         $travelRequest = $this->repository->create([
-            'user_id' => Auth::user()->id,
+            'user_id' => $dto->userId,
             'destination' => $dto->destination,
             'departure_date' => $dto->departureDate,
             'return_date' => $dto->returnDate,
@@ -74,7 +74,7 @@ class TravelRequestService
             throw new Exception('Apenas pedidos aprovados podem ser cancelados por esta função');
         }
 
-        $approvalTime = $travelRequest->updated_at;
+        $approvalTime = $travelRequest->updated_at instanceof Carbon ? $travelRequest->updated_at : Carbon::parse($travelRequest->updated_at);
         $hoursElapsed = $approvalTime->diffInHours(now());
 
         if ($hoursElapsed > 48) {

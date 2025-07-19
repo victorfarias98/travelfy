@@ -4,6 +4,10 @@
 
 Esta API permite gerenciar pedidos de viagem, incluindo criação, listagem, visualização, atualização de status e cancelamento. A API utiliza autenticação baseada em usuários e diferentes níveis de permissão.
 
+## Collection
+
+Criei um arquivo com uma collection do Postman, basta importar e testar :D
+
 ## Autenticação
 
 Todos os endpoints requerem autenticação. O usuário autenticado é obtido através de `Auth::user()`.
@@ -376,7 +380,6 @@ Lista os pedidos de viagem do usuário autenticado.
 3. **Form Requests**: Utiliza `StoreTravelRequestRequest` e `UpdateTravelRequestRequest` para validação
 4. **Relacionamentos**: Carrega automaticamente o relacionamento `user` em algumas operações
 5. **Paginação**: Utiliza paginação padrão do Laravel com metadados de navegação
-6. **Tratamento de Exceções**: Implementa tratamento robusto de exceções com diferentes tipos de erro
 
 ---
 
@@ -387,3 +390,142 @@ Lista os pedidos de viagem do usuário autenticado.
 - **StoreTravelRequestRequest**: Validação para criação de pedidos
 - **UpdateTravelRequestRequest**: Validação para atualização de status
 - **Laravel Auth**: Sistema de autenticação do Laravel
+
+
+
+## 📋 Pré-requisitos
+
+- **Docker**: versão 20.10+
+- **Docker Compose**: versão 2.0+
+- **Git**: para controle de versão
+
+### Verificando os Pré-requisitos
+
+```bash
+# Verificar Docker
+docker --version
+
+# Verificar Docker Compose
+docker-compose --version
+
+# Verificar Make
+make --version
+
+# Verificar Git
+git --version
+```
+
+## 🛠️ Instalação Rápida
+
+### 1. Clone o Repositório
+
+```bash
+git clone <repository-url>
+cd travel-requests-api
+```
+
+### 2. Instalação Completa com Make
+
+```bash
+# Este comando fará toda a instalação automaticamente
+make install
+```
+
+O comando `make install` executa automaticamente:
+- Build das imagens Docker
+- Inicialização dos containers
+- Instalação das dependências
+- Cópia do arquivo de ambiente
+- Geração das chaves de aplicação e JWT
+- Execução das migrations
+- Execução dos seeders
+
+### 3. Verificar Status
+
+```bash
+# Verificar se todos os containers estão rodando
+make status
+
+# Ver logs em tempo real
+make logs
+```
+
+## 🔧 Instalação Manual (Passo a Passo)
+
+Se preferir fazer a instalação manualmente:
+
+### 1. Construir as Imagens
+
+```bash
+make build
+```
+
+### 2. Iniciar os Containers
+
+```bash
+make up
+```
+
+### 3. Instalar Dependências
+
+```bash
+make composer-install
+```
+
+### 4. Configurar Ambiente
+
+```bash
+# Copiar arquivo de ambiente
+make copy-env
+
+# Gerar chave da aplicação
+make generate-key
+
+# Gerar secret do JWT
+make jwt-secret
+```
+
+### 5. Configurar Banco de Dados
+
+```bash
+# Executar migrations
+make migrate
+
+# Executar seeders
+make seed
+```
+
+## 🏗️ Arquitetura do Projeto
+
+### Containers Disponíveis
+
+| Container | Porta | Descrição |
+|-----------|-------|-----------|
+| `travel_requests_app` | - | Aplicação Laravel (PHP 8.3) |
+| `travel_requests_webserver` | 80 | Nginx (Web Server) |
+| `travel_requests_db` | 3306 | MySQL 8.0 |
+
+### Estrutura de Diretórios
+
+```
+project-root/
+├── app/                    # Código da aplicação
+├── database/              # Migrations, Seeders, Factories
+├── docker/               # Configurações Docker
+│   ├── nginx/           # Configuração Nginx
+│   ├── php/             # Configuração PHP
+│   ├── mysql/           # Configuração MySQL
+│   └── start.sh         # Script de inicialização
+├── routes/               # Rotas da API
+├── tests/                # Testes automatizados
+├── docker-compose.yml    # Configuração Docker Compose
+├── Dockerfile           # Imagem Docker
+├── Makefile            # Comandos automatizados
+└── SETUP.md            # Este arquivo
+```
+
+
+
+## Agradecimentos
+
+Agradeço demais pela oportunidade de estar avaliando esse projeto, estou muito ansioso pelo resultado :D 

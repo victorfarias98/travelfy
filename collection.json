@@ -1,0 +1,170 @@
+{
+    "info": {
+      "name": "Travelfy API",
+      "_postman_id": "travelfy-collection-001",
+      "description": "Coleção de endpoints da API Travelfy para uso no Postman.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Auth",
+        "item": [
+          {
+            "name": "Login",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"\",\n  \"password\": \"\"\n}"
+              },
+              "url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] }
+            }
+          },
+          {
+            "name": "Register",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"\",\n  \"email\": \"\",\n  \"password\": \"\",\n  \"password_confirmation\": \"\"\n}"
+              },
+              "url": { "raw": "{{base_url}}/api/register", "host": ["{{base_url}}"], "path": ["api", "register"] }
+            }
+          },
+          {
+            "name": "Me (Usuário logado)",
+            "request": {
+              "method": "GET",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": { "raw": "{{base_url}}/api/me", "host": ["{{base_url}}"], "path": ["api", "me"] }
+            }
+          },
+          {
+            "name": "Refresh Token",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": { "raw": "{{base_url}}/api/refresh-token", "host": ["{{base_url}}"], "path": ["api", "refresh-token"] }
+            }
+          },
+          {
+            "name": "Logout",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": { "raw": "{{base_url}}/api/logout", "host": ["{{base_url}}"], "path": ["api", "logout"] }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Travel Requests",
+        "item": [
+          {
+            "name": "Listar Pedidos (admin ou usuário)",
+            "request": {
+              "method": "GET",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/travel-requests",
+                "host": ["{{base_url}}"],
+                "path": ["api", "travel-requests"],
+                "query": [
+                  { "key": "status", "value": "" },
+                  { "key": "destination", "value": "" },
+                  { "key": "departure_date_from", "value": "" },
+                  { "key": "departure_date_to", "value": "" },
+                  { "key": "return_date_from", "value": "" },
+                  { "key": "return_date_to", "value": "" },
+                  { "key": "user_id", "value": "" },
+                  { "key": "created_from", "value": "" },
+                  { "key": "created_to", "value": "" },
+                  { "key": "order_by", "value": "" },
+                  { "key": "order_direction", "value": "" },
+                  { "key": "per_page", "value": "" }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Criar Pedido",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"destination\": \"\",\n  \"departure_date\": \"\",\n  \"return_date\": \"\",\n  \"reason\": \"\"\n}"
+              },
+              "url": { "raw": "{{base_url}}/api/travel-requests", "host": ["{{base_url}}"], "path": ["api", "travel-requests"] }
+            }
+          },
+          {
+            "name": "Meus Pedidos",
+            "request": {
+              "method": "GET",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": { "raw": "{{base_url}}/api/travel-requests/my-requests", "host": ["{{base_url}}"], "path": ["api", "travel-requests", "my-requests"] }
+            }
+          },
+          {
+            "name": "Detalhes do Pedido",
+            "request": {
+              "method": "GET",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": { "raw": "{{base_url}}/api/travel-requests/:id", "host": ["{{base_url}}"], "path": ["api", "travel-requests", ":id"] }
+            }
+          },
+          {
+            "name": "Atualizar Status (admin)",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"status\": \"aprovado\"\n}"
+              },
+              "url": { "raw": "{{base_url}}/api/travel-requests/:id/status", "host": ["{{base_url}}"], "path": ["api", "travel-requests", ":id", "status"] }
+            }
+          },
+          {
+            "name": "Cancelar Pedido Aprovado (admin)",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" }
+              ],
+              "url": { "raw": "{{base_url}}/api/travel-requests/:id/cancel-approved", "host": ["{{base_url}}"], "path": ["api", "travel-requests", ":id", "cancel-approved"] }
+            }
+          }
+        ]
+      }
+    ],
+    "variable": [
+      { "key": "base_url", "value": "http://localhost" },
+      { "key": "token", "value": "" }
+    ]
+  }
