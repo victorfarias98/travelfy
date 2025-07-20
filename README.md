@@ -515,13 +515,10 @@ project-root/
 │   ├── nginx/           # Configuração Nginx
 │   ├── php/             # Configuração PHP
 │   ├── mysql/           # Configuração MySQL
-│   └── start.sh         # Script de inicialização
 ├── routes/               # Rotas da API
 ├── tests/                # Testes automatizados
 ├── docker-compose.yml    # Configuração Docker Compose
 ├── Dockerfile           # Imagem Docker
-├── Makefile            # Comandos automatizados
-└── SETUP.md            # Este arquivo
 ```
 
 
